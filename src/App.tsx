@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useGameState } from './hooks/useGameState';
 import { PlayerSetup } from './components/PlayerSetup';
 import { PlayerOrder } from './components/PlayerOrder';
 import { GameScreen } from './components/GameScreen';
 import { GameOver } from './components/GameOver';
+import { PastGames } from './components/PastGames';
 
 export default function App() {
   const {
@@ -11,6 +12,7 @@ export default function App() {
     setTheme,
     recentPlayers,
     currentGame,
+    pastGames,
     startSetup,
     setPlayers,
     reorderPlayers,
@@ -22,6 +24,8 @@ export default function App() {
     resetGame,
     backToSetup,
   } = useGameState();
+
+  const [showHistory, setShowHistory] = useState(false);
 
   // Apply theme to <html>
   useEffect(() => {
@@ -42,6 +46,11 @@ export default function App() {
     reorderPlayers(resetPlayers);
   };
 
+  // History view
+  if (showHistory) {
+    return <PastGames pastGames={pastGames} onBack={() => setShowHistory(false)} />;
+  }
+
   // No game in progress — show welcome
   if (!currentGame) {
     return (
@@ -55,6 +64,12 @@ export default function App() {
             className="w-full py-4 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl text-lg transition-colors"
           >
             Start New Game →
+          </button>
+          <button
+            onClick={() => setShowHistory(true)}
+            className="w-full mt-3 py-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium rounded-xl transition-colors"
+          >
+            Past Games {pastGames.length > 0 ? `(${pastGames.length})` : ''}
           </button>
           <div className="mt-4 flex justify-center">
             <button

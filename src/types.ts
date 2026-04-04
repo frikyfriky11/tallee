@@ -14,9 +14,16 @@ export interface GameState {
   createdAt: string;
 }
 
+export interface PastGame {
+  id: string;
+  finishedAt: string;
+  players: { name: string; score: number }[];
+}
+
 export interface AppStorage {
   recentPlayers: string[];
   lastGamePlayers: string[];
   theme: 'light' | 'dark';
   currentGame: GameState | null;
+  pastGames: PastGame[];
 }
