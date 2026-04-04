@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useLocalStorage } from './useLocalStorage';
-import type { Player, AppStorage } from '../types';
+import type { Player, AppStorage, PastGame } from '../types';
 
 const STORAGE_KEY = 'tallee_v1';
 
@@ -13,12 +13,13 @@ const defaultStorage: AppStorage = {
   lastGamePlayers: [],
   theme: 'dark',
   currentGame: null,
+  pastGames: [],
 };
 
 export function useGameState() {
   const [storage, setStorage] = useLocalStorage<AppStorage>(STORAGE_KEY, defaultStorage);
 
-  const { recentPlayers, lastGamePlayers, theme, currentGame } = storage;
+  const { recentPlayers, lastGamePlayers, theme, currentGame, pastGames } = storage;
 
   const setTheme = useCallback(
     (t: 'light' | 'dark') => setStorage((s) => ({ ...s, theme: t })),
@@ -133,11 +134,22 @@ export function useGameState() {
   }, [setStorage]);
 
   const endGame = useCallback(() => {
-    setStorage((s) => ({
-      ...s,
-      lastGamePlayers: s.currentGame ? s.currentGame.players.map((p) => p.name) : s.lastGamePlayers,
-      currentGame: s.currentGame ? { ...s.currentGame, phase: 'gameover' } : s.currentGame,
-    }));
+    setStorage((s) => {
+      if (!s.currentGame) return s;
+      const pastGame: PastGame = {
+        id: makeId(),
+        finishedAt: new Date().toISOString(),
+        players: [...s.currentGame.players]
+          .sort((a, b) => b.score - a.score)
+          .map((p) => ({ name: p.name, score: p.score })),
+      };
+      return {
+        ...s,
+        lastGamePlayers: s.currentGame.players.map((p) => p.name),
+        currentGame: { ...s.currentGame, phase: 'gameover' },
+        pastGames: [pastGame, ...s.pastGames].slice(0, 20),
+      };
+    });
   }, [setStorage]);
 
   const resetGame = useCallback(() => {
@@ -157,6 +169,7 @@ export function useGameState() {
     recentPlayers,
     lastGamePlayers,
     currentGame,
+    pastGames,
     startSetup,
     setPlayers,
     reorderPlayers,
