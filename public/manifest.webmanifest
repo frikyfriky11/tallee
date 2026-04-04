@@ -1,0 +1,18 @@
+{
+  "name": "Tallee",
+  "short_name": "Tallee",
+  "description": "Fast, simple score tracking for game night",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+services:
+  tallee:
+    image: ghcr.io/frikyfriky11/tallee:main
+    # build: .   # uncomment to build locally instead
+    ports:
+      - "8080:80"
+    restart: unless-stopped
