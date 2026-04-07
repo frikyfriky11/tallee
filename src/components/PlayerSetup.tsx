@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useUmami } from '@danielgtmn/umami-react';
 
 interface Props {
   recentPlayers: string[];
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function PlayerSetup({ recentPlayers, initialNames, onConfirm, onReset }: Props) {
+  const { track } = useUmami();
   const [inputs, setInputs] = useState<string[]>(
     initialNames && initialNames.length >= 2 ? initialNames : ['', ''],
   );
@@ -43,6 +45,7 @@ export function PlayerSetup({ recentPlayers, initialNames, onConfirm, onReset }:
     if (nextEmpty !== -1) {
       inputRefs.current[nextEmpty]?.focus();
     }
+    track('recent-player-selected');
   };
 
   const addPlayer = () => {
@@ -63,7 +66,10 @@ export function PlayerSetup({ recentPlayers, initialNames, onConfirm, onReset }:
   const canStart = uniqueNames.length >= 2;
 
   const handleSubmit = () => {
-    if (canStart) onConfirm(uniqueNames);
+    if (canStart) {
+      track('players-confirmed', { player_count: uniqueNames.length });
+      onConfirm(uniqueNames);
+    }
   };
 
   return (
@@ -163,7 +169,10 @@ export function PlayerSetup({ recentPlayers, initialNames, onConfirm, onReset }:
         </button>
 
         <button
-          onClick={onReset}
+          onClick={() => {
+            track('setup-cancelled');
+            onReset();
+          }}
           className="w-full py-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 text-sm transition-colors"
         >
           Cancel &amp; start over

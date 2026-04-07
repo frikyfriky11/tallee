@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useUmami } from '@danielgtmn/umami-react';
 import { useGameState } from './hooks/useGameState';
 import { PlayerSetup } from './components/PlayerSetup';
 import { PlayerOrder } from './components/PlayerOrder';
@@ -7,6 +8,7 @@ import { GameOver } from './components/GameOver';
 import { PastGames } from './components/PastGames';
 
 export default function App() {
+  const { track } = useUmami();
   const {
     theme,
     setTheme,
@@ -60,20 +62,30 @@ export default function App() {
           <h1 className="text-4xl font-black mb-2">Tallee</h1>
           <p className="text-slate-500 dark:text-slate-400 mb-8 text-sm">Fast, simple score tracking for game night</p>
           <button
-            onClick={startSetup}
+            onClick={() => {
+              track('game-started');
+              startSetup();
+            }}
             className="w-full py-4 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl text-lg transition-colors"
           >
             Start New Game →
           </button>
           <button
-            onClick={() => setShowHistory(true)}
+            onClick={() => {
+              track('past-games-viewed');
+              setShowHistory(true);
+            }}
             className="w-full mt-3 py-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium rounded-xl transition-colors"
           >
             Past Games {pastGames.length > 0 ? `(${pastGames.length})` : ''}
           </button>
           <div className="mt-4 flex justify-center">
             <button
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              onClick={() => {
+                const newTheme = theme === 'dark' ? 'light' : 'dark';
+                track('theme-toggled', { theme: newTheme });
+                setTheme(newTheme);
+              }}
               className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-sm transition-colors"
             >
               {theme === 'dark' ? '☀️ Light mode' : '🌙 Dark mode'}
@@ -89,7 +101,11 @@ export default function App() {
       <div className="min-h-dvh bg-slate-100 dark:bg-slate-900">
         <div className="flex justify-end px-4 pt-4">
           <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={() => {
+              const newTheme = theme === 'dark' ? 'light' : 'dark';
+              track('theme-toggled', { theme: newTheme });
+              setTheme(newTheme);
+            }}
             className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 text-sm transition-colors"
           >
             {theme === 'dark' ? '☀️' : '🌙'}

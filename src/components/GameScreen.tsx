@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUmami } from '@danielgtmn/umami-react';
 import type { GameState } from '../types';
 
 interface Props {
@@ -21,6 +22,7 @@ function getRankSuffix(rank: number) {
 }
 
 export function GameScreen({ game, onAddScore, onUndo, onNextPlayer, onPrevPlayer, onEndGame, onReset }: Props) {
+  const { track } = useUmami();
   const [customInput, setCustomInput] = useState('');
   const [showCustom, setShowCustom] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -38,6 +40,7 @@ export function GameScreen({ game, onAddScore, onUndo, onNextPlayer, onPrevPlaye
 
   const handleQuickScore = (pts: number) => {
     onAddScore(pts);
+    track('quick-score-added', { points: pts });
     setLastAdded(pts);
     setTimeout(() => setLastAdded(null), 800);
   };
@@ -46,6 +49,7 @@ export function GameScreen({ game, onAddScore, onUndo, onNextPlayer, onPrevPlaye
     const val = parseInt(customInput, 10);
     if (!isNaN(val) && val !== 0) {
       onAddScore(val);
+      track('custom-score-added', { points: val });
       setLastAdded(val);
       setTimeout(() => setLastAdded(null), 800);
       setCustomInput('');
@@ -55,6 +59,7 @@ export function GameScreen({ game, onAddScore, onUndo, onNextPlayer, onPrevPlaye
 
   const handleUndo = () => {
     onUndo();
+    track('score-undone');
     setLastAdded(null);
   };
 
@@ -84,8 +89,13 @@ export function GameScreen({ game, onAddScore, onUndo, onNextPlayer, onPrevPlaye
               <button
                 onClick={() => {
                   setConfirmAction(null);
-                  if (confirmAction === 'endgame') onEndGame();
-                  else onReset();
+                  if (confirmAction === 'endgame') {
+                    track('end-game-confirmed', { player_count: players.length });
+                    onEndGame();
+                  } else {
+                    track('game-abandoned', { player_count: players.length });
+                    onReset();
+                  }
                 }}
                 className="flex-1 py-3 bg-red-600 hover:bg-red-500 text-white font-semibold rounded-xl transition-colors"
               >

@@ -1,3 +1,4 @@
+import { useUmami } from '@danielgtmn/umami-react';
 import type { GameState } from '../types';
 
 interface Props {
@@ -16,6 +17,7 @@ function getRankSuffix(rank: number) {
 const MEDALS = ['🥇', '🥈', '🥉'];
 
 export function GameOver({ game, onNewGame, onRematch }: Props) {
+  const { track } = useUmami();
   const ranked = [...game.players]
     .sort((a, b) => b.score - a.score)
     .map((p, i) => ({ ...p, rank: i + 1 }));
@@ -62,13 +64,19 @@ export function GameOver({ game, onNewGame, onRematch }: Props) {
 
       <div className="flex flex-col gap-3 max-w-md mx-auto w-full mt-auto">
         <button
-          onClick={onRematch}
+          onClick={() => {
+            track('rematch-started', { player_count: game.players.length, winner: winner.name });
+            onRematch();
+          }}
           className="w-full py-4 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl text-lg transition-colors"
         >
           Rematch (same players)
         </button>
         <button
-          onClick={onNewGame}
+          onClick={() => {
+            track('new-game-after-gameover', { player_count: game.players.length, winner: winner.name });
+            onNewGame();
+          }}
           className="w-full py-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium rounded-xl transition-colors"
         >
           New Game
