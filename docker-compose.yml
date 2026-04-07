@@ -5,3 +5,7 @@ services:
     ports:
       - "8080:80"
     restart: unless-stopped
+    environment:
+      # Optional: set these to enable Umami analytics
+      UMAMI_WEBSITE_ID: ""
+      UMAMI_URL: ""
