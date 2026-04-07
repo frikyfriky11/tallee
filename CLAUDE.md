@@ -62,6 +62,27 @@ All game logic lives in `src/hooks/useGameState.ts`. It wraps `useLocalStorage` 
 - **@dnd-kit** for drag-and-drop in `PlayerOrder`
 - ESLint flat config with `react-hooks` and `react-refresh` plugins
 
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/types.ts` | `Player`, `GameState`, `AppStorage` interfaces — start here for data shapes |
+| `src/hooks/useLocalStorage.ts` | Generic localStorage hook with JSON serialization |
+| `src/hooks/useGameState.ts` | All game logic — single source of truth, exposes full API to `App.tsx` |
+| `src/App.tsx` | Phase router — reads from `useGameState`, passes everything down as props |
+| `src/components/PlayerSetup.tsx` | Player name entry with autocomplete from recent players |
+| `src/components/PlayerOrder.tsx` | Drag-and-drop turn order (dnd-kit) |
+| `src/components/GameScreen.tsx` | Main scoring UI — leaderboard, score input, turn navigation |
+| `src/components/GameOver.tsx` | Final standings with medals, rematch/new game options |
+
+## Architectural Decisions
+
+- **Prop drilling is intentional** — no Context or global store; the component tree is shallow enough that drilling is cleaner than adding abstraction
+- **All game logic in `useGameState`** — components are pure UI; if you're adding game behaviour, it goes in the hook, not in a component
+- **No tests** — not configured; do not add a test framework unless explicitly asked
+- **Mobile-first, no-scroll layout** — every screen must fit within 375×667 (iPhone SE) without scrolling; do not introduce layouts that require vertical scroll
+- **New features should follow the hook pattern** — add state and mutations to `useGameState`, expose via the returned object, consume in `App.tsx`, pass as props
+
 ## Working
 
 After every code change:
