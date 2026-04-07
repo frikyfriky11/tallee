@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useUmami } from '@danielgtmn/umami-react';
 import {
   DndContext,
   closestCenter,
@@ -64,6 +65,7 @@ interface Props {
 }
 
 export function PlayerOrder({ players: initialPlayers, onConfirm, onBack, onReset }: Props) {
+  const { track } = useUmami();
   const [players, setPlayers] = useState(initialPlayers);
 
   const sensors = useSensors(
@@ -107,13 +109,19 @@ export function PlayerOrder({ players: initialPlayers, onConfirm, onBack, onRese
 
       <div className="flex gap-3">
         <button
-          onClick={onBack}
+          onClick={() => {
+            track('order-back-clicked');
+            onBack();
+          }}
           className="flex-1 py-3.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white font-medium rounded-xl transition-colors"
         >
           ← Back
         </button>
         <button
-          onClick={() => onConfirm(players)}
+          onClick={() => {
+            track('player-order-confirmed', { player_count: players.length });
+            onConfirm(players);
+          }}
           className="flex-2 flex-1 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors"
         >
           Start Game →
@@ -121,7 +129,10 @@ export function PlayerOrder({ players: initialPlayers, onConfirm, onBack, onRese
       </div>
 
       <button
-        onClick={onReset}
+        onClick={() => {
+          track('order-cancelled');
+          onReset();
+        }}
         className="w-full py-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 text-sm transition-colors"
       >
         Cancel &amp; start over
