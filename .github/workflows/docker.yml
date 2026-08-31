@@ -58,7 +58,7 @@ jobs:
           cache-to: type=gha,mode=max
 
       # Floating :main tag -> tell Portainer to re-pull & redeploy the stack.
-      # (Pinned versions are deployed intentionally via a homelab-gitops commit instead.)
+      # (Pinned versions are deployed intentionally via a homelab commit instead.)
       - name: Trigger Portainer redeploy
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: curl -fsSL -X POST "${{ secrets.PORTAINER_WEBHOOK }}"
